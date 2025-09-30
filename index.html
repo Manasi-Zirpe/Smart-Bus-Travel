@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SBT - Student Bus Pass Generator</title>
+  <style>
+    :root{
+      --blue-1:#0b63d6;
+      --blue-2:#0e74ff;
+      --accent:#0a2540;
+      --muted:#6b7b8c;
+      --card:#f6f9ff;
+      --glass: rgba(255,255,255,0.08);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background: linear-gradient(180deg,var(--card),#eef6ff);color:var(--accent);}
+
+    /* Header / Nav */
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(90deg,var(--blue-1),var(--blue-2));color:white;position:sticky;top:0;z-index:10;}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}
+    .brand h1{margin:0;font-size:18px;letter-spacing:0.6px}
+    nav ul{list-style:none;display:flex;gap:14px;margin:0;padding:0}
+    nav a{color:white;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
+    nav a:hover{background:rgba(255,255,255,0.12)}
+
+    /* Layout */
+    .container{max-width:1100px;margin:28px auto;padding:18px}
+    .card{background:white;border-radius:14px;padding:20px;box-shadow:0 8px 22px rgba(11,99,214,0.06);}
+
+    /* Home */
+    #home .hero{display:flex;gap:20px;align-items:center}
+    .hero .info{flex:1}
+    .hero h2{margin:0 0 8px;font-size:28px;color:var(--accent)}
+    .cta-row{display:flex;gap:12px;margin-top:16px}
+    .btn{background:var(--blue-2);color:white;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--blue-2);border:2px solid rgba(14,116,255,0.12)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed}
+
+    /* Forms */
+    form .row{display:flex;gap:12px;margin-bottom:12px}
+    form .row .col{flex:1}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], input[type=email], input[type=password], input[type=tel], input[type=date], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #dbe7ff;background:transparent}
+    select{appearance:none}
+    .small{font-size:12px;color:var(--muted)}
+
+    /* Uploads grid */
+    .uploads{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .uploads .upload{background:var(--card);padding:10px;border-radius:8px;border:1px dashed #d0e4ff;text-align:center}
+    .uploads input[type=file]{display:block;margin:8px auto;font-size:12px}
+
+    /* Pass selection */
+    .passes{display:flex;gap:12px;flex-wrap:wrap}
+    .pass{flex:1;min-width:140px;background:white;border-radius:12px;padding:14px;border:2px solid rgba(11,99,214,0.06);box-shadow:0 4px 12px rgba(11,99,214,0.03);cursor:pointer;transition:all 0.2s}
+    .pass:hover{border-color:var(--blue-2);transform:translateY(-2px)}
+    .pass input[type=radio]{margin-right:8px}
+    .pass h3{margin:0 0 8px}
+
+    /* Payment */
+    .payment-options{display:flex;gap:12px;flex-wrap:wrap}
+    .payment-card{padding:20px;border-radius:10px;border:1px solid #e6f0ff;min-width:300px}
+
+    /* Pass preview */
+    .pass-card{width:100%;max-width:420px;margin:0 auto;padding:18px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#f0f7ff);box-shadow:0 18px 40px rgba(11,99,214,0.12);border:2px solid rgba(11,99,214,0.06)}
+    .pass-header{display:flex;align-items:center;gap:12px}
+    .pass-left{flex:1}
+    .pass-photo{width:120px;height:140px;background:#f2f6ff;border:2px solid rgba(11,99,214,0.06);display:flex;align-items:center;justify-content:center;border-radius:6px;overflow:hidden}
+    .pass-photo img{width:100%;height:100%;object-fit:cover}
+    .pass-details{margin-top:12px}
+    .field{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e6f6ff}
+    .field:last-child{border:none}
+    .validity{margin-top:18px;text-align:center;font-weight:700}
+
+    /* Status badges */
+    .status-badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600}
+    .status-pending{background:#fff3cd;color:#856404}
+    .status-approved{background:#d4edda;color:#155724}
+    .status-rejected{background:#f8d7da;color:#721c24}
+
+    /* Footer */
+    footer{padding:24px;text-align:center;color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .hero{flex-direction:column;align-items:flex-start}
+      nav ul{gap:8px}
+      .uploads{grid-template-columns:1fr}
+      .pass{min-width:160px}
+    }
+    @media (max-width:520px){
+      header{padding:12px}
+      .logo{width:42px;height:42px;font-size:16px}
+      .brand h1{font-size:16px}
+      .container{padding:12px}
+      .pass-photo{width:94px;height:110px}
+      nav ul{flex-direction:column;gap:4px}
+    }
+
+    /* Helpers */
+    .hidden{display:none !important}
+    .muted{color:var(--muted);font-size:13px}
+    .center{display:flex;justify-content:center;align-items:center}
+    .text-center{text-align:center}
+    .mt-12{margin-top:12px}
+    .success-msg{color:#155724;background:#d4edda;padding:12px;border-radius:8px;margin:12px 0}
+    .error-msg{color:#721c24;background:#f8d7da;padding:12px;border-radius:8px;margin:12px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">SBT</div>
+      <div>
+        <h1>SBT Smart Bus Travel</h1>
+        <div style="font-size:12px;opacity:0.9">Student Bus Pass & Verification</div>
+      </div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#" data-route="home" class="navlink">Home</a></li>
+        <li><a href="#" data-route="signup" class="navlink" id="navSignup">Sign up</a></li>
+        <li><a href="#" data-route="studentform" class="navlink" id="navForm">Student Form</a></li>
+        <li><a href="#" data-route="faq" class="navlink">FAQs</a></li>
+        <li><a href="#" data-route="login" class="navlink" id="navLogin">Login</a></li>
+        <li><a href="#" id="navLogout" class="navlink hidden" style="background:rgba(255,255,255,0.12)">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Home Page -->
+    <section id="home" class="card page">
+      <div class="hero">
+        <div class="info">
+          <h2>Skip the queue — generate your student bus pass online</h2>
+          <p class="muted">Fast verification, document upload, secure payments and an instantly downloadable pass for use in Pune PMPML routes.</p>
+          <div class="cta-row">
+            <button class="btn" data-route-btn="signup">Get Started</button>
+            <button class="btn secondary" data-route-btn="login">Login</button>
+          </div>
+        </div>
+        <div style="width:320px">
+          <div class="card" style="padding:14px;background:linear-gradient(180deg,#fff,#eef7ff);text-align:center">
+            <h3 style="margin:0">Why use SBT</h3>
+            <ul style="text-align:left;margin:12px 0;padding-left:18px;color:var(--muted)">
+              <li>Fill once — verify — pay — get pass</li>
+              <li>Mobile-ready & printable pass</li>
+              <li>Document uploads (up to 10MB each)</li>
+              <li>Instant digital pass generation</li>
+            </ul>
+            <div class="muted" style="font-size:12px">Designed for students and transport admins.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signup -->
+    <section id="signup" class="card page hidden">
+      <h2>Create account</h2>
+      <p class="muted">Create your SBT account using email or phone</p>
+      <div id="signupMsg"></div>
+      <form id="signupForm">
+        <div class="row">
+          <div class="col">
+            <label>First name *</label>
+            <input type="text" id="firstName" required />
+          </div>
+          <div class="col">
+            <label>Last name *</label>
+            <input type="text" id="lastName" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Create account using *</label>
+            <select id="accountMethod">
+              <option value="email">Email</option>
+              <option value="phone">Phone</option>
+            </select>
+          </div>
+          <div class="col" id="accountInputCol">
+            <label id="accountLabel">Email *</label>
+            <input type="email" id="accountInput" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Password *</label>
+            <input type="password" id="password" required minlength="6" />
+          </div>
+          <div class="col">
+            <label>Confirm Password *</label>
+            <input type="password" id="passwordConfirm" required />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+          <button type="submit" class="btn" id="signupBtn">Sign up</button>
+          <div class="small muted">Already have account? <a href="#" data-route="login">Login</a></div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Login -->
+    <section id="login" class="card page hidden">
+      <h2>Login</h2>
+      <div id="loginMsg"></div>
+      <form id="loginForm">
+        <label>Email or Phone *</label>
+        <input type="text" id="loginId" required />
+        <label style="margin-top:8px">Password *</label>
+        <input type="password" id="loginPass" required />
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn" type="submit" id="loginBtn">Login</button>
+          <button class="btn secondary" type="button" data-route="signup">Sign up</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Student Form -->
+    <section id="studentform" class="card page hidden">
+      <h2>Student Information Form</h2>
+      <p class="muted">Fill in your details carefully. All fields marked with * are required.</p>
+      <div id="formMsg"></div>
+      <form id="studentForm">
+        <div class="row">
+          <div class="col"><label>Student name *</label><input type="text" id="stu_name" required></div>
+          <div class="col"><label>College name *</label><input type="text" id="stu_college" required></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Student Email *</label><input type="email" id="stu_email" required></div>
+          <div class="col"><label>College Email *</label><input type="email" id="stu_college_email" required></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Class / Course *</label><input type="text" id="stu_course" required></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Date of Birth *</label><input type="date" id="stu_dob" required></div>
+          <div class="col"><label>Phone number *</label><input type="tel" id="stu_phone" required placeholder="10 digit number"></div>
+        </div>
+        <label>Address *</label>
+        <textarea id="stu_address" rows="2" required></textarea>
+        <div class="row">
+          <div class="col"><label>Start point (Bus route) *</label><input type="text" id="start_point" required></div>
+          <div class="col"><label>Destination point *</label><input type="text" id="dest_point" required></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>Duration of pass *</label>
+          <select id="duration">
+            <option value="1">1 month</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12">1 year</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label>Aadhar Number *</label>
+            <input type="text" id="aadharNumber" placeholder="XXXX-XXXX-XXXX" required maxlength="14">
+          </div>
+        </div>
+
+        <h3>Upload Documents (max 10MB each)</h3>
+        <div class="uploads">
+          <div class="upload">
+            <div class="small">Student photo *</div>
+            <input type="file" id="photo" accept="image/*" required />
+            <div id="photoPreview" class="muted small"></div>
+          </div>
+          <div class="upload">
+            <div class="small">Aadhar card (image/pdf) *</div>
+            <input type="file" id="aadhar" accept="image/*,.pdf" required />
+            <div id="aadharPreview" class="muted small"></div>
+          </div>
+          <div class="upload">
+            <div class="small">Bonafide Certificate</div>
+            <input type="file" id="bonafide" accept="image/*,.pdf"/>
+            <div id="bonafidePreview" class="muted small"></div>
+          </div>
+          <div class="upload">
+            <div class="small">Light bill (address proof)</div>
+            <input type="file" id="lightbill" accept="image/*,.pdf"/>
+            <div id="lightbillPreview" class="muted small"></div>
+          </div>
+          <div class="upload">
+            <div class="small">College fees receipt</div>
+            <input type="file" id="feesreceipt" accept="image/*,.pdf"/>
+            <div id="feesPreview" class="muted small"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+          <button class="btn" type="submit" id="submitFormBtn">Submit for verification</button>
+          <div class="muted small">After verification you will be notified via email.</div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Application Status -->
+    <section id="applicationStatus" class="card page hidden">
+      <h2>Application Status</h2>
+      <div id="appStatusContent" style="margin-top:12px"></div>
+      <div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+        <button class="btn" id="editApplicationBtn">Edit Form</button>
+        <button class="btn" id="proceedFromStatusBtn" style="display:none">Proceed to Payment</button>
+      </div>
+    </section>
+
+    <!-- Pass Selection -->
+    <section id="passselection" class="card page hidden">
+      <h2>Select Pass Duration</h2>
+      <p class="muted">Choose the duration for your bus pass</p>
+      <div class="passes">
+        <label class="pass">
+          <input type="radio" name="passOption" value="1" data-amount="750" checked> 
+          <h3>1 Month</h3>
+          <div style="font-size:20px;font-weight:700;color:var(--blue-2)">₹750</div>
+        </label>
+        <label class="pass">
+          <input type="radio" name="passOption" value="3" data-amount="2000"> 
+          <h3>3 Months</h3>
+          <div style="font-size:20px;font-weight:700;color:var(--blue-2)">₹2000</div>
+          <div class="small" style="color:#28a745">Save ₹250</div>
+        </label>
+        <label class="pass">
+          <input type="radio" name="passOption" value="6" data-amount="3000"> 
+          <h3>6 Months</h3>
+          <div style="font-size:20px;font-weight:700;color:var(--blue-2)">₹3000</div>
+          <div class="small" style="color:#28a745">Save ₹1500</div>
+        </label>
+        <label class="pass">
+          <input type="radio" name="passOption" value="12" data-amount="5000"> 
+          <h3>1 Year</h3>
+          <div style="font-size:20px;font-weight:700;color:var(--blue-2)">₹5000</div>
+          <div class="small" style="color:#28a745">Save ₹4000</div>
+        </label>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+        <button class="btn" id="proceedToPayment">Proceed to payment</button>
+      </div>
+    </section>
+
+    <!-- Payment -->
+    <section id="payment" class="card page hidden">
+      <h2>Payment</h2>
+      <p class="muted">Complete your payment to generate the bus pass</p>
+      <div id="paymentAmount" style="font-size:24px;font-weight:700;margin:12px 0"></div>
+      <div class="payment-card">
+        <h3 style="margin-top:0">Choose Payment Method</h3>
+        <label style="display:block;margin:8px 0">
+          <input type="radio" name="paymode" value="phonepe" checked> PhonePe
+        </label>
+        <label style="display:block;margin:8px 0">
+          <input type="radio" name="paymode" value="gpay"> Google Pay
+        </label>
+        <label style="display:block;margin:8px 0">
+          <input type="radio" name="paymode" value="paytm"> Paytm
+        </label>
+        <label style="margin-top:12px;display:block">Or enter UPI ID</label>
+        <input type="text" id="upiId" placeholder="yourname@bank" style="margin-top:6px;padding:10px;border-radius:8px;border:1px solid #e6f3ff;width:100%">
+        <div style="margin-top:14px">
+          <button class="btn" id="payBtn">Pay Now</button>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="muted">(This is a demo. In production, integrate with real payment gateway.)</div>
+    </section>
+
+    <!-- Generate Pass -->
+    <section id="generate" class="card page hidden">
+      <h2 class="text-center">🎉 Your Bus Pass is Ready!</h2>
+      <p class="text-center muted">You can download or print this pass</p>
+      <div class="pass-card">
+        <div class="pass-header">
+          <div class="pass-left">
+            <div style="font-weight:800;font-size:16px">PMPML Pune</div>
+            <div style="font-size:20px;margin-top:6px;font-weight:700">Student Bus Pass</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Pass ID: <span id="g_passid"></span></div>
+          </div>
+          <div class="pass-photo" id="generatedPhoto">
+            <div class="muted">Photo</div>
+          </div>
+        </div>
+
+        <div class="pass-details">
+          <div class="field"><div>Name:</div><div id="g_name" style="font-weight:600"></div></div>
+          <div class="field"><div>Age:</div><div id="g_age"></div></div>
+          <div class="field"><div>College:</div><div id="g_college"></div></div>
+          <div class="field"><div>Course:</div><div id="g_course"></div></div>
+          <div class="field"><div>Aadhar No:</div><div id="g_aadhar"></div></div>
+          <div class="field"><div>Route:</div><div id="g_route"></div></div>
+          <div class="field"><div>Address:</div><div id="g_address" style="font-size:11px"></div></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:2px dashed #e8f1ff">
+          <div style="text-align:center;flex:1">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Issue Date</div>
+            <div style="font-weight:700" id="g_issue"></div>
+          </div>
+          <div class="validity" style="flex:1">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Valid Until</div>
+            <div id="g_validity" style="font-size:16px;color:var(--blue-2)"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;text-align:center;padding-top:12px;border-top:1px solid #e8f1ff">
+          <div style="font-size:10px;color:var(--muted)">Authorized by Transport Administrator</div>
+          <div style="margin-top:8px;font-style:italic;color:var(--muted);font-size:11px">Digital Signature Applied</div>
+        </div>
+
+        <div style="margin-top:16px; text-align: center;">
+          <button class="btn" id="downloadPass">📥 Download Pass</button>
+          <button class="btn secondary" style="margin-left:8px" onclick="window.print()">🖨 Print</button>
+        </div>
+      </div>
+      
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn secondary" data-route-btn="home">Back to Home</button>
+      </div>
+    </section>
+<!-- FAQs -->
+    <section id="faq" class="card page hidden">
+      <h2>Frequently Asked Questions</h2>
+      <div style="margin-top:20px">
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">How long does verification take?</h3>
+          <p class="muted">Typically 1-3 working days depending on your college's verification process. You'll receive an email once verified.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">What file size is allowed?</h3>
+          <p class="muted">Maximum 10MB per document. We accept images (JPG, PNG) and PDF files.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">Is payment secure?</h3>
+          <p class="muted">This demo uses simulated payments. In production, we integrate with secure payment gateways like Razorpay or PayU.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">Can I edit my application after submission?</h3>
+          <p class="muted">Yes, you can edit your application before verification is complete. Login and go to your application status.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">What documents do I need?</h3>
+          <p class="muted">Required: Student photo, Aadhar card. Optional but recommended: Bonafide certificate, address proof (light bill), college fees receipt.</p>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <h3 style="color:var(--blue-2);margin-bottom:8px">How do I use the pass?</h3>
+          <p class="muted">Download or print your pass. Show it to the bus conductor when boarding PMPML buses in Pune.</p>
+        </div>
+      </div>
+      
+      <div style="margin-top:24px;padding:16px;background:var(--card);border-radius:10px">
+        <h3 style="margin-top:0">Still have questions?</h3>
+        <p class="muted">Contact us at support@sbtbus.com or call 1800-123-4567</p>
+      </div>
+    </section>
+
+  </main>
+  
+  <footer>
+    SBT Smart Bus Travel System • Designed for students • © 2025
+  </footer>
+
+  <script>
+    const API_URL = 'http://localhost:3000';
+    
+    // ==================== NAVIGATION ====================
+    const pages = document.querySelectorAll('.page');
+    
+    function showPage(id) {
+      pages.forEach(p => p.classList.add('hidden'));
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      updateNav();
+    }
+
+    // Route links
+    document.querySelectorAll('[data-route]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const route = a.getAttribute('data-route');
+        if (route === 'studentform' && !getLoggedInUserId()) {
+          alert('Please login first to access the student form');
+          showPage('login');
+        } else {
+          showPage(route);
+        }
+      });
+    });
+
+    document.querySelectorAll('.navlink').forEach(n => {
+      n.addEventListener('click', e => {
+        e.preventDefault();
+        const route = n.dataset.route;
+        if (route === 'studentform' && !getLoggedInUserId()) {
+          alert('Please login first');
+          showPage('login');
+        } else {
+          showPage(route);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-route-btn]').forEach(b => {
+      b.addEventListener('click', e => {
+        showPage(b.getAttribute('data-route-btn'));
+      });
+    });
+
+    // ==================== SESSION MANAGEMENT ====================
+    function setLoggedInUserId(id) {
+      sessionStorage.setItem('sbt_logged_in', id);
+      updateNav();
+    }
+
+    function getLoggedInUserId() {
+      return sessionStorage.getItem('sbt_logged_in');
+    }
+
+    function clearLoggedInUser() {
+      sessionStorage.removeItem('sbt_logged_in');
+      updateNav();
+    }
+
+    function updateNav() {
+      const isLoggedIn = getLoggedInUserId();
+      document.getElementById('navSignup').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('navLogin').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('navLogout').classList.toggle('hidden', !isLoggedIn);
+    }
+
+    // Logout handler
+    document.getElementById('navLogout').addEventListener('click', e => {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) {
+        clearLoggedInUser();
+        showPage('home');
+        alert('Logged out successfully');
+      }
+    });
+
+    // ==================== SIGNUP ====================
+    const accountMethod = document.getElementById('accountMethod');
+    const accountLabel = document.getElementById('accountLabel');
+    const accountInput = document.getElementById('accountInput');
+
+    accountMethod.addEventListener('change', () => {
+      if (accountMethod.value === 'phone') {
+        accountLabel.textContent = 'Phone number *';
+        accountInput.type = 'tel';
+        accountInput.placeholder = '10 digit mobile number';
+      } else {
+        accountLabel.textContent = 'Email *';
+        accountInput.type = 'email';
+        accountInput.placeholder = 'name@example.com';
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('signupBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      const pw = document.getElementById('password').value;
+      const pwc = document.getElementById('passwordConfirm').value;
+
+      if (pw !== pwc) {
+        showMessage('signupMsg', 'Passwords do not match', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign up';
+        return;
+      }
+
+      if (pw.length < 6) {
+        showMessage('signupMsg', 'Password must be at least 6 characters', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign up';
+        return;
+      }
+
+      const data = {
+        first: document.getElementById('firstName').value.trim(),
+        last: document.getElementById('lastName').value.trim(),
+        accountMethod: accountMethod.value,
+        account: accountInput.value.trim(),
+        password: pw
+      };
+
+      try {
+        const res = await fetch(API_URL + '/signup', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.userId) {
+          setLoggedInUserId(result.userId);
+          showMessage('signupMsg', 'Account created successfully! Redirecting to student form...', 'success');
+          setTimeout(() => showPage('studentform'), 1500);
+        } else {
+          showMessage('signupMsg', result.message || 'Signup failed', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showMessage('signupMsg', 'Error connecting to server. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign up';
+      }
+    });
+
+    // ==================== LOGIN ====================
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+
+      const data = {
+        account: document.getElementById('loginId').value.trim(),
+        password: document.getElementById('loginPass').value
+      };
+
+      try {
+        const res = await fetch(API_URL + '/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.user) {
+          setLoggedInUserId(result.user.id.toString());
+          showMessage('loginMsg', 'Login successful!', 'success');
+          
+          setTimeout(() => {
+            if (result.user.student && result.user.status !== 'not_submitted') {
+              showApplicationStatus();
+            } else {
+              showPage('studentform');
+            }
+          }, 1000);
+        } else {
+          showMessage('loginMsg', result.message || 'Invalid credentials', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showMessage('loginMsg', 'Error connecting to server', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    });
+
+    // ==================== FILE HANDLING ====================
+    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+    let uploadedPhotoData = null;
+
+    function handleFileInput(inputId, previewId, isImage = false) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+
+      input.addEventListener('change', () => {
+        const f = input.files[0];
+        if (!f) {
+          preview.textContent = 'No file selected';
+          if (inputId === 'photo') uploadedPhotoData = null;
+          return;
+        }
+
+        if (f.size > MAX_BYTES) {
+          alert('File too large. Maximum ' + (MAX_BYTES / 1024 / 1024) + 'MB allowed');
+          input.value = '';
+          preview.textContent = '';
+          return;
+        }
+
+        preview.textContent = f.name + ' (' + Math.round(f.size / 1024) + ' KB)';
+
+        if (isImage && f.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            uploadedPhotoData = ev.target.result;
+            preview.innerHTML = '<img src="' + ev.target.result + '" style="max-width:120px;border-radius:6px;margin-top:6px;border:1px solid #ddd">';
+          };
+          reader.readAsDataURL(f);
+        }
+      });
+    }
+
+    ['photo', 'aadhar', 'bonafide', 'lightbill', 'feesreceipt'].forEach(id => {
+      handleFileInput(id, id + 'Preview', id === 'photo');
+    });
+
+    // ==================== STUDENT FORM ====================
+   // ==================== STUDENT FORM ====================
+document.getElementById('studentForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('submitFormBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const photoFile = document.getElementById('photo').files[0];
+  const aadharFile = document.getElementById('aadhar').files[0];
+
+  if (!photoFile || !aadharFile) {
+    showMessage('formMsg', 'Please upload student photo and aadhar card (required)', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Submit for verification';
+    return;
+  }
+
+  const userId = getLoggedInUserId();
+  if (!userId) {
+    alert('Session expired. Please login again');
+    showPage('login');
+    return;
+  }
+
+  const formData = new FormData();
+  const fields = [
+    'stu_name', 'stu_college', 'stu_email', 'stu_college_email',
+    'stu_course', 'stu_dob', 'stu_phone', 'stu_address',
+    'start_point', 'dest_point', 'duration', 'aadharNumber'
+  ];
+
+  fields.forEach(field => {
+    const value = document.getElementById(field).value || '';
+    formData.append(field, value);
+  });
+
+  // Add files to formData
+  ['photo', 'aadhar', 'bonafide', 'lightbill', 'feesreceipt'].forEach(id => {
+    const file = document.getElementById(id).files[0];
+    if (file) formData.append(id, file);
+  });
+
+  formData.append('user_id', userId);
+
+  try {
+    const res = await fetch(API_URL + '/submit-form', {
+      method: 'POST',
+      body: formData
+      // Don't set Content-Type header for FormData, browser will set it automatically
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      showMessage('formMsg', result.message || 'Form submitted successfully!', 'success');
+      // Wait a bit then proceed to pass selection
+      setTimeout(() => {
+        showPage('passselection');
+      }, 2000);
+    } else {
+      showMessage('formMsg', result.message || 'Submission failed', 'error');
+    }
+  } catch (err) {
+    console.error('Form submission error:', err);
+    showMessage('formMsg', 'Error submitting form. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit for verification';
+  }
+});
+    // ==================== APPLICATION STATUS ====================
+    async function showApplicationStatus() {
+      const userId = getLoggedInUserId();
+      if (!userId) {
+        showPage('login');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL + '/application-status/' + userId);
+        const data = await res.json();
+
+        const content = document.getElementById('appStatusContent');
+        if (data.form) {
+          const status = data.form.verification_status || 'pending';
+          let statusHTML = '';
+
+          if (status === 'pending') {
+            statusHTML = '<span class="status-badge status-pending">⏳ Pending Verification</span>';
+          } else if (status === 'approved') {
+            statusHTML = '<span class="status-badge status-approved">✅ Verified</span>';
+            document.getElementById('proceedFromStatusBtn').style.display = 'inline-block';
+          } else if (status === 'rejected') {
+            statusHTML = '<span class="status-badge status-rejected">❌ Rejected</span>';
+          }
+
+          content.innerHTML = `
+            <div style="margin-bottom:16px">${statusHTML}</div>
+            <p><strong>Name:</strong> ${data.form.stu_name}</p>
+            <p><strong>College:</strong> ${data.form.stu_college}</p>
+            <p><strong>Course:</strong> ${data.form.stu_course}</p>
+            <p><strong>Submitted:</strong> ${new Date(data.form.submitted_at).toLocaleDateString()}</p>
+          `;
+        } else {
+          content.innerHTML = '<p class="muted">No application submitted yet.</p>';
+        }
+
+        showPage('applicationStatus');
+      } catch (err) {
+        console.error(err);
+        alert('Error loading application status');
+      }
+    }
+
+    document.getElementById('editApplicationBtn').addEventListener('click', () => {
+      showPage('studentform');
+    });
+
+    document.getElementById('proceedFromStatusBtn').addEventListener('click', () => {
+      showPage('passselection');
+    });
+
+    // ==================== PASS SELECTION ====================
+    function selectedPass() {
+      const selected = document.querySelector('input[name="passOption"]:checked');
+      return selected ? parseInt(selected.value) : 1;
+    }
+
+    function passAmount(months = null) {
+      if (months === null) months = selectedPass();
+      const selected = document.querySelector('input[name="passOption"][value="' + months + '"]');
+      return selected ? parseInt(selected.dataset.amount) : 750;
+    }
+
+    document.getElementById('proceedToPayment').addEventListener('click', async () => {
+      const months = selectedPass();
+      const amount = passAmount(months);
+      const userId = getLoggedInUserId();
+
+      if (!userId) {
+        alert('Please login first');
+        showPage('login');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL + '/select-pass', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ user_id: userId, months, amount })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('paymentAmount').textContent = 'Amount to pay: ₹' + amount;
+          showPage('payment');
+        } else {
+          alert('Error: ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error selecting pass. Please try again.');
+      }
+    });
+
+    // ==================== PAYMENT ====================
+    document.getElementById('payBtn').addEventListener('click', async () => {
+      const userId = getLoggedInUserId();
+      if (!userId) {
+        alert('Please login first');
+        showPage('login');
+        return;
+      }
+
+      const months = selectedPass();
+      const amount = passAmount(months);
+      const paymentMethod = document.querySelector('input[name="paymode"]:checked').value;
+      const upiId = document.getElementById('upiId').value.trim();
+
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const res = await fetch(API_URL + '/process-payment', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            user_id: userId,
+            amount,
+            payment_method: paymentMethod,
+            upi_id: upiId || null
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert('Payment successful! Generating your pass...');
+          await generatePass();
+        } else {
+          alert('Payment failed: ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error processing payment');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pay Now';
+      }
+    });
+
+    // ==================== GENERATE PASS ====================
+    async function generatePass() {
+      const userId = getLoggedInUserId();
+      if (!userId) {
+        showPage('login');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL + '/user-complete/' + userId);
+        const data = await res.json();
+
+        if (!data.form) {
+          alert('No student form data found');
+          return;
+        }
+
+        const form = data.form;
+        const pass = data.pass || { months: 1 };
+
+        // Calculate age
+        const dob = new Date(form.stu_dob);
+        const age = new Date().getFullYear() - dob.getFullYear();
+
+        // Calculate validity
+        const issueDate = new Date();
+        const validUntil = new Date(issueDate);
+        validUntil.setMonth(validUntil.getMonth() + (pass.months || 1));
+
+        // Generate pass ID
+        const passId = 'SBT' + Date.now().toString().slice(-8);
+
+        // Populate pass details
+        document.getElementById('g_passid').textContent = passId;
+        document.getElementById('g_name').textContent = form.stu_name;
+        document.getElementById('g_age').textContent = age + ' years';
+        document.getElementById('g_college').textContent = form.stu_college;
+        document.getElementById('g_course').textContent = form.stu_course || 'N/A';
+        document.getElementById('g_aadhar').textContent = maskAadhar(form.aadhar_number);
+        document.getElementById('g_route').textContent = form.start_point + ' → ' + form.dest_point;
+        document.getElementById('g_address').textContent = form.stu_address;
+        document.getElementById('g_issue').textContent = formatDate(issueDate);
+        document.getElementById('g_validity').textContent = formatDate(validUntil);
+
+        // Set photo if available
+        const photoElement = document.getElementById('generatedPhoto');
+        if (uploadedPhotoData) {
+          photoElement.innerHTML = '<img src="' + uploadedPhotoData + '" alt="Student Photo">';
+        } else if (form.photo) {
+          photoElement.innerHTML = '<img src="' + API_URL + '/uploads/' + form.photo + '" alt="Student Photo" onerror="this.parentElement.innerHTML=\'<div class=\'muted\'>Photo</div>\'">';
+        }
+
+        showPage('generate');
+      } catch (err) {
+        console.error(err);
+        alert('Error generating pass');
+      }
+    }
+
+    // ==================== DOWNLOAD PASS ====================
+    document.getElementById('downloadPass').addEventListener('click', () => {
+      const passCard = document.querySelector('.pass-card');
+      
+      // Simple approach: open print dialog
+      window.print();
+    });
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function showMessage(elementId, message, type) {
+      const element = document.getElementById(elementId);
+      element.className = type === 'success' ? 'success-msg' : 'error-msg';
+      element.textContent = message;
+      element.style.display = 'block';
+      
+      setTimeout(() => {
+        element.style.display = 'none';
+      }, 5000);
+    }
+
+    function maskAadhar(aadhar) {
+      if (!aadhar) return 'N/A';
+      const cleaned = aadhar.replace(/\D/g, '');
+      if (cleaned.length === 12) {
+        return 'XXXX-XXXX-' + cleaned.slice(-4);
+      }
+      return aadhar;
+    }
+
+    function formatDate(date) {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return day + '/' + month + '/' + year;
+    }
+
+    // ==================== INITIALIZATION ====================
+    updateNav();
+    showPage('home');
+
+    // Check if user is logged in on page load
+    if (getLoggedInUserId()) {
+      console.log('User is logged in:', getLoggedInUserId());
+    }
+</script>
+</body>
+</html>
