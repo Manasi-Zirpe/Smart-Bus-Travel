@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SBT - Verification</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init("8sjigZdmUnH3XVHQ0");</script>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center;
+           align-items: center; min-height: 100vh; margin: 0; background: #f0f4f8; }
+    .card { background: white; border-radius: 12px; padding: 40px;
+            max-width: 480px; width: 90%; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h2 { color: #1A3C6E; }
+    p  { color: #555; margin-bottom: 24px; }
+    .btn { padding: 14px 32px; border: none; border-radius: 8px;
+           font-size: 16px; font-weight: bold; cursor: pointer;
+           margin: 8px; width: 180px; }
+    .approve { background: #1D9E75; color: white; }
+    .reject  { background: #E24B4A; color: white; }
+    .result  { margin-top: 24px; padding: 16px; border-radius: 8px; display: none; font-size: 15px; }
+    .success { background: #d4edda; color: #155724; }
+    .error   { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>SBT Bus Pass Verification</h2>
+  <p id="info">Loading...</p>
+  <div id="buttons">
+    <button class="btn approve" onclick="verify('approved')">Approve</button>
+    <button class="btn reject"  onclick="verify('rejected')">Reject</button>
+  </div>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  const email  = params.get('email');
+  const name   = params.get('name');
+
+  const studentEmail = decodeURIComponent(email || '');
+  const studentName  = decodeURIComponent(name  || '');
+
+  document.getElementById('info').textContent =
+    "Student: " + studentName + " | " + studentEmail;
+
+  if (action === 'approved' || action === 'rejected') {
+    verify(action);
+  }
+
+  async function verify(decision) {
+    document.getElementById('buttons').style.display = 'none';
+    document.getElementById('result').style.display  = 'block';
+    document.getElementById('result').className      = 'result';
+    document.getElementById('result').textContent    = 'Sending email...';
+
+    const isApproved = decision === 'approved';
+
+    try {
+      await emailjs.send("service_t3dr9wl", "template_mzagosc", {
+        student_name:  studentName,
+        student_email: studentEmail,
+        college_name:  "College",
+        start_point:   "",
+        dest_point:    "",
+        duration:      "",
+        subject_line:  isApproved ? "Application APPROVED" : "Application REJECTED",
+        message: isApproved
+          ? "Congratulations! Your application has been approved by your college. Please login to SBT and proceed to payment to generate your bus pass."
+          : "Sorry, your application has been rejected by your college. Please login to SBT, correct your details, and resubmit your application.",
+        action_text: "Visit: https://manasi-zirpe.github.io/Smart-Bus-Travel/"
+      });
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result success';
+      resultDiv.textContent = isApproved
+        ? "Approved! " + studentName + " has been notified by email."
+        : "Rejected. "  + studentName + " has been notified by email.";
+
+    } catch (err) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result error';
+      resultDiv.textContent = 'Email failed. Error: ' + (err.text || err.message || JSON.stringify(err));
+    }
+  }
+</script>
+</body>
+</html>
