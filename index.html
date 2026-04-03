@@ -4,117 +4,524 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SBT - Student Bus Pass Generator</title>
-  <style>
+ <style>
+    /* Government-Themed Color Palette */
     :root{
-      --blue-1:#0b63d6;
-      --blue-2:#0e74ff;
-      --accent:#0a2540;
-      --muted:#6b7b8c;
-      --card:#f6f9ff;
-      --glass: rgba(255,255,255,0.08);
-      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      /* Primary Government Blue (Authoritative, Trustworthy) */
+      --gov-blue-dark: #003366; /* Deep Navy Blue for headers/accents */
+      --gov-blue-medium: #005691; /* Official Blue for primary buttons/links */
+      --gov-blue-light: #e6f7ff; /* Very light blue for subtle backgrounds */
+      
+      /* Neutral Tones (Professional, Accessible) */
+      --gov-text: #212529; /* Dark Gray for main text */
+      --gov-muted: #6c757d; /* Medium Gray for secondary text/labels */
+      --gov-background: #ffffff; /* White for primary background/cards */
+      --gov-border: #dee2e6; /* Light gray for borders/dividers */
+      --gov-card-bg: #f8f9fa; /* Very light gray for card backgrounds */
+      
+      /* Status Colors (Standard, Clear) */
+      --status-success: #198754; /* Green */
+      --status-warning: #ffc107; /* Yellow */
+      --status-danger: #dc3545; /* Red */
+      
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
-    *{box-sizing:border-box}
-    body{margin:0;background: linear-gradient(180deg,var(--card),#eef6ff);color:var(--accent);}
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        /* Subtle background gradient for depth */
+        background: linear-gradient(180deg, var(--gov-card-bg), #eef1f5);
+        color: var(--gov-text);
+        line-height: 1.6;
+    }
 
     /* Header / Nav */
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(90deg,var(--blue-1),var(--blue-2));color:white;position:sticky;top:0;z-index:10;}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}
-    .brand h1{margin:0;font-size:18px;letter-spacing:0.6px}
-    nav ul{list-style:none;display:flex;gap:14px;margin:0;padding:0}
-    nav a{color:white;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
-    nav a:hover{background:rgba(255,255,255,0.12)}
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 28px;
+        /* Solid, authoritative header color */
+        background: var(--gov-blue-dark);
+        color: white;
+        border-bottom: 4px solid var(--gov-blue-medium); /* Stronger separator */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo {
+        width: 44px; /* Slightly smaller, more refined */
+        height: 44px;
+        border-radius: 4px; /* Square/slightly rounded for official feel */
+        background: rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    .brand h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.8px;
+        font-weight: 700;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 20px; /* More space for clarity */
+        margin: 0;
+        padding: 0;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px; /* Less rounded */
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+
+    nav a:hover {
+        background: rgba(240, 209, 33, 0.2);
+    }
 
     /* Layout */
-    .container{max-width:1100px;margin:28px auto;padding:18px}
-    .card{background:white;border-radius:14px;padding:20px;box-shadow:0 8px 22px rgba(11,99,214,0.06);}
+    .container {
+        max-width: 1000px;
+        margin: 32px auto; /* More margin */
+        padding: 0 20px;
+    }
+    .card {
+        background: var(--gov-background);
+        border-radius: 8px; /* More moderate rounding */
+        padding: 24px;
+        border: 1px solid var(--gov-border); /* Subtle border for definition */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Lighter, less aggressive shadow */
+    }
 
     /* Home */
-    #home .hero{display:flex;gap:20px;align-items:center}
-    .hero .info{flex:1}
-    .hero h2{margin:0 0 8px;font-size:28px;color:var(--accent)}
-    .cta-row{display:flex;gap:12px;margin-top:16px}
-    .btn{background:var(--blue-2);color:white;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
-    .btn.secondary{background:transparent;color:var(--blue-2);border:2px solid rgba(14,116,255,0.12)}
-    .btn:disabled{opacity:0.5;cursor:not-allowed}
+    #home .hero {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
+    .hero .info {
+        flex: 1;
+    }
+    .hero h2 {
+        margin: 0 0 12px;
+        font-size: 32px;
+        color: var(--gov-blue-dark);
+        font-weight: 700;
+    }
+    .cta-row {
+        display: flex;
+        gap: 16px;
+        margin-top: 24px;
+    }
+    .btn {
+        background: var(--gov-blue-medium);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    .btn:hover {
+        background: rgb(245, 245, 35);
+    }
+    .btn.secondary {
+        background: transparent;
+        color: var(--gov-blue-medium);
+        border: 2px solid var(--gov-blue-medium);
+    }
+    .btn.secondary:hover {
+        background: var(--gov-blue-light);
+        color: var(--gov-blue-dark);
+    }
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 
     /* Forms */
-    form .row{display:flex;gap:12px;margin-bottom:12px}
+    form .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Better responsiveness for forms */
+        gap: 20px;
+        margin-bottom: 20px;
+    }
     form .row .col{flex:1}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type=text], input[type=email], input[type=password], input[type=tel], input[type=date], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #dbe7ff;background:transparent}
-    select{appearance:none}
-    .small{font-size:12px;color:var(--muted)}
+    label {
+        display: block;
+        font-size: 14px;
+        color: var(--gov-muted);
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    input[type=text], input[type=email], input[type=password], input[type=tel], input[type=date], select, textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid var(--gov-border);
+        background: var(--gov-background);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--gov-blue-medium);
+        box-shadow: 0 0 0 2px var(--gov-blue-light);
+        outline: none;
+    }
+    select {
+        appearance: none;
+    }
+    .small {
+        font-size: 12px;
+        color: var(--gov-muted);
+    }
 
     /* Uploads grid */
-    .uploads{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .uploads .upload{background:var(--card);padding:10px;border-radius:8px;border:1px dashed #d0e4ff;text-align:center}
-    .uploads input[type=file]{display:block;margin:8px auto;font-size:12px}
+    .uploads {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+    .uploads .upload {
+        background: var(--gov-card-bg);
+        padding: 16px;
+        border-radius: 6px;
+        border: 1px dashed var(--gov-blue-medium);
+        text-align: center;
+    }
+    .uploads input[type=file] {
+        display: block;
+        margin: 10px auto;
+        font-size: 13px;
+        color: var(--gov-blue-dark);
+    }
 
     /* Pass selection */
-    .passes{display:flex;gap:12px;flex-wrap:wrap}
-    .pass{flex:1;min-width:140px;background:white;border-radius:12px;padding:14px;border:2px solid rgba(11,99,214,0.06);box-shadow:0 4px 12px rgba(11,99,214,0.03);cursor:pointer;transition:all 0.2s}
-    .pass:hover{border-color:var(--blue-2);transform:translateY(-2px)}
-    .pass input[type=radio]{margin-right:8px}
-    .pass h3{margin:0 0 8px}
+    .passes {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .pass {
+        flex: 1;
+        min-width: 180px;
+        background: var(--gov-background);
+        border-radius: 6px;
+        padding: 18px;
+        border: 2px solid var(--gov-border);
+        box-shadow: none; /* Removing heavy shadow */
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .pass:hover, .pass.selected {
+        border-color: var(--gov-blue-medium);
+        background: var(--gov-blue-light);
+        transform: translateY(-2px);
+    }
+    .pass input[type=radio] {
+        margin-right: 8px;
+    }
+    .pass h3 {
+        margin: 0 0 8px;
+        color: var(--gov-blue-dark);
+        font-size: 1.1rem;
+    }
 
     /* Payment */
-    .payment-options{display:flex;gap:12px;flex-wrap:wrap}
-    .payment-card{padding:20px;border-radius:10px;border:1px solid #e6f0ff;min-width:300px}
+    .payment-options {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .payment-card {
+        padding: 24px;
+        border-radius: 8px;
+        border: 1px solid var(--gov-border);
+        min-width: 320px;
+        background: var(--gov-card-bg);
+    }
 
     /* Pass preview */
-    .pass-card{width:100%;max-width:420px;margin:0 auto;padding:18px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#f0f7ff);box-shadow:0 18px 40px rgba(11,99,214,0.12);border:2px solid rgba(11,99,214,0.06)}
-    .pass-header{display:flex;align-items:center;gap:12px}
-    .pass-left{flex:1}
-    .pass-photo{width:120px;height:140px;background:#f2f6ff;border:2px solid rgba(11,99,214,0.06);display:flex;align-items:center;justify-content:center;border-radius:6px;overflow:hidden}
-    .pass-photo img{width:100%;height:100%;object-fit:cover}
-    .pass-details{margin-top:12px}
-    .field{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e6f6ff}
-    .field:last-child{border:none}
-    .validity{margin-top:18px;text-align:center;font-weight:700}
+    .pass-card {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 8px;
+        /* Clean, professional background for the pass */
+        background: linear-gradient(180deg, var(--gov-background), var(--gov-blue-light));
+        box-shadow: 0 10px 20px rgba(0, 51, 102, 0.08);
+        border: 1px solid var(--gov-blue-medium);
+    }
+    .pass-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .pass-left {
+        flex: 1;
+    }
+    .pass-photo {
+        width: 100px;
+        height: 120px;
+        background: var(--gov-blue-light);
+        border: 1px solid var(--gov-blue-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .pass-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .pass-details {
+        margin-top: 16px;
+    }
+    .field {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--gov-border);
+        font-size: 15px;
+    }
+    .field:last-child {
+        border: none;
+    }
+    .field strong {
+        color: var(--gov-blue-dark);
+    }
+    .validity {
+        margin-top: 20px;
+        text-align: center;
+        font-weight: 700;
+        color: var(--status-success);
+        font-size: 1.1rem;
+    }
 
     /* Status badges */
-    .status-badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600}
-    .status-pending{background:#fff3cd;color:#856404}
-    .status-approved{background:#d4edda;color:#155724}
-    .status-rejected{background:#f8d7da;color:#721c24}
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-pending {
+        background: var(--status-warning);
+        color: #664d03;
+    }
+    .status-approved {
+        background: var(--status-success);
+        color: white;
+    }
+    .status-rejected {
+        background: var(--status-danger);
+        color: white;
+    }
 
     /* Footer */
-    footer{padding:24px;text-align:center;color:var(--muted)}
+    footer {
+        padding: 30px;
+        text-align: center;
+        color: var(--gov-muted);
+        background: var(--gov-card-bg);
+        border-top: 1px solid var(--gov-border);
+        margin-top: 30px;
+        font-size: 14px;
+
+    }
 
     /* Responsive */
-    @media (max-width:900px){
-      .hero{flex-direction:column;align-items:flex-start}
-      nav ul{gap:8px}
-      .uploads{grid-template-columns:1fr}
-      .pass{min-width:160px}
+    @media (max-width: 900px) {
+        .hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        nav ul {
+            gap: 12px;
+        }
     }
-    @media (max-width:520px){
-      header{padding:12px}
-      .logo{width:42px;height:42px;font-size:16px}
-      .brand h1{font-size:16px}
-      .container{padding:12px}
-      .pass-photo{width:94px;height:110px}
-      nav ul{flex-direction:column;gap:4px}
+    @media (max-width: 600px) {
+        header {
+            padding: 12px 18px;
+        }
+        .logo {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+        .brand h1 {
+            font-size: 16px;
+        }
+        .container {
+            padding: 12px;
+        }
+        .pass-photo {
+            width: 80px;
+            height: 100px;
+        }
+        nav ul {
+            flex-direction: column;
+            gap: 4px;
+        }
+        .cta-row {
+            flex-direction: column;
+            gap: 10px;
+        }
     }
 
     /* Helpers */
-    .hidden{display:none !important}
-    .muted{color:var(--muted);font-size:13px}
-    .center{display:flex;justify-content:center;align-items:center}
-    .text-center{text-align:center}
-    .mt-12{margin-top:12px}
-    .success-msg{color:#155724;background:#d4edda;padding:12px;border-radius:8px;margin:12px 0}
-    .error-msg{color:#721c24;background:#f8d7da;padding:12px;border-radius:8px;margin:12px 0}
-  </style>
+    .hidden {
+        display: none !important;
+    }
+    .muted {
+        color: var(--gov-muted);
+        font-size: 13px;
+    }
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .mt-12 {
+        margin-top: 12px;
+    }
+    /* Updated message colors for authority */
+    .success-msg {
+        color: var(--status-success);
+        background: #d1e7dd; /* Very light green */
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid var(--status-success);
+        margin: 12px 0;
+        font-weight: 500;
+    }
+    .error-msg {
+        color: var(--status-danger);
+        background: #f8d7da; /* Very light red */
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid var(--status-danger);
+        margin: 12px 0;
+        font-weight: 500;
+    }
+
+    /* Chatbot Button */
+#chatbotBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#005691;
+  color:white;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Chatbot Box */
+#chatbotBox{
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  width:300px;
+  background:white;
+  border-radius:10px;
+  border:1px solid #ddd;
+  box-shadow:0 5px 20px rgba(0,0,0,0.2);
+  display:flex;
+  flex-direction:column;
+}
+
+/* Header */
+#chatHeader{
+  background:#003366;
+  color:white;
+  padding:10px;
+  text-align:center;
+  font-weight:bold;
+}
+
+/* Messages */
+#chatMessages{
+  height:250px;
+  overflow-y:auto;
+  padding:10px;
+  font-size:14px;
+}
+
+/* Input */
+#chatInputArea{
+  display:flex;
+  border-top:1px solid #ddd;
+}
+
+#chatInput{
+  flex:1;
+  border:none;
+  padding:10px;
+}
+
+#chatInputArea button{
+  background:#005691;
+  color:white;
+  border:none;
+  padding:10px;
+  cursor:pointer;
+}
+
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>emailjs.init("8sjigZdmUnH3XVHQ0");</script>
+
+
 </head>
 <body>
   <header>
     <div class="brand">
-      <div class="logo">SBT</div>
+      <div class="logo">
+        <img src="bus logo.png" height="60" width="60">
+      </div>
       <div>
-        <h1>SBT Smart Bus Travel</h1>
+        <h1>Smart Bus Travel</h1>
         <div style="font-size:12px;opacity:0.9">Student Bus Pass & Verification</div>
       </div>
     </div>
@@ -123,6 +530,10 @@
         <li><a href="#" data-route="home" class="navlink">Home</a></li>
         <li><a href="#" data-route="signup" class="navlink" id="navSignup">Sign up</a></li>
         <li><a href="#" data-route="studentform" class="navlink" id="navForm">Student Form</a></li>
+        
+        <!-- In your navbar -->
+        <li><a href="track.html">Track Bus</a></li>
+
         <li><a href="#" data-route="faq" class="navlink">FAQs</a></li>
         <li><a href="#" data-route="login" class="navlink" id="navLogin">Login</a></li>
         <li><a href="#" id="navLogout" class="navlink hidden" style="background:rgba(255,255,255,0.12)">Logout</a></li>
@@ -363,6 +774,15 @@
         </label>
         <label style="margin-top:12px;display:block">Or enter UPI ID</label>
         <input type="text" id="upiId" placeholder="yourname@bank" style="margin-top:6px;padding:10px;border-radius:8px;border:1px solid #e6f3ff;width:100%">
+
+        <label style="display:block;margin:8px 0">
+  <input type="radio" name="paymode" value="razorpay"> Razorpay QR
+</label>
+<div id="razorpayQR" style="display:none;margin-top:10px;text-align:center">
+  <img src="QrCode.jpeg" alt="Razorpay QR" style="max-width:200px;border:1px solid #ddd;border-radius:8px;padding:6px">
+  <p class="muted" style="margin-top:6px">Scan this QR to pay with Razorpay</p>
+</div>
+
         <div style="margin-top:14px">
           <button class="btn" id="payBtn">Pay Now</button>
         </div>
@@ -469,6 +889,22 @@
     SBT Smart Bus Travel System • Designed for students • © 2025
   </footer>
 
+  <!-- Your page content -->
+
+<!-- Chatbot Code -->
+<div id="chatbotBtn">💬</div>
+
+<div id="chatbotBox" class="hidden">
+  <div id="chatHeader">Smart Bus Assistant</div>
+  <div id="chatMessages"></div>
+
+  <div id="chatInputArea">
+    <input type="text" id="chatInput" placeholder="Ask something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     const API_URL = 'http://localhost:3000';
     
@@ -705,77 +1141,7 @@
       handleFileInput(id, id + 'Preview', id === 'photo');
     });
 
-    // ==================== STUDENT FORM ====================
-   // ==================== STUDENT FORM ====================
-document.getElementById('studentForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = document.getElementById('submitFormBtn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  const photoFile = document.getElementById('photo').files[0];
-  const aadharFile = document.getElementById('aadhar').files[0];
-
-  if (!photoFile || !aadharFile) {
-    showMessage('formMsg', 'Please upload student photo and aadhar card (required)', 'error');
-    btn.disabled = false;
-    btn.textContent = 'Submit for verification';
-    return;
-  }
-
-  const userId = getLoggedInUserId();
-  if (!userId) {
-    alert('Session expired. Please login again');
-    showPage('login');
-    return;
-  }
-
-  const formData = new FormData();
-  const fields = [
-    'stu_name', 'stu_college', 'stu_email', 'stu_college_email',
-    'stu_course', 'stu_dob', 'stu_phone', 'stu_address',
-    'start_point', 'dest_point', 'duration', 'aadharNumber'
-  ];
-
-  fields.forEach(field => {
-    const value = document.getElementById(field).value || '';
-    formData.append(field, value);
-  });
-
-  // Add files to formData
-  ['photo', 'aadhar', 'bonafide', 'lightbill', 'feesreceipt'].forEach(id => {
-    const file = document.getElementById(id).files[0];
-    if (file) formData.append(id, file);
-  });
-
-  formData.append('user_id', userId);
-
-  try {
-    const res = await fetch(API_URL + '/submit-form', {
-      method: 'POST',
-      body: formData
-      // Don't set Content-Type header for FormData, browser will set it automatically
-    });
-
-    const result = await res.json();
-
-    if (result.success) {
-      showMessage('formMsg', result.message || 'Form submitted successfully!', 'success');
-      // Wait a bit then proceed to pass selection
-      setTimeout(() => {
-        showPage('passselection');
-      }, 2000);
-    } else {
-      showMessage('formMsg', result.message || 'Submission failed', 'error');
-    }
-  } catch (err) {
-    console.error('Form submission error:', err);
-    showMessage('formMsg', 'Error submitting form. Please try again.', 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit for verification';
-  }
-});
+   
     // ==================== APPLICATION STATUS ====================
     async function showApplicationStatus() {
       const userId = getLoggedInUserId();
@@ -872,52 +1238,65 @@ document.getElementById('studentForm').addEventListener('submit', async e => {
       }
     });
 
-    // ==================== PAYMENT ====================
-    document.getElementById('payBtn').addEventListener('click', async () => {
-      const userId = getLoggedInUserId();
-      if (!userId) {
-        alert('Please login first');
-        showPage('login');
-        return;
-      }
+    // ==================== RAZORPAY QR SHOW/HIDE ====================
+document.querySelectorAll('input[name="paymode"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    const qrDiv = document.getElementById('razorpayQR');
+    if (this.value === 'razorpay') {
+      qrDiv.style.display = 'block';
+    } else {
+      qrDiv.style.display = 'none';
+    }
+  });
+});
 
-      const months = selectedPass();
-      const amount = passAmount(months);
-      const paymentMethod = document.querySelector('input[name="paymode"]:checked').value;
-      const upiId = document.getElementById('upiId').value.trim();
+// ==================== PAYMENT ====================
+document.getElementById('payBtn').addEventListener('click', async () => {
+  const userId = getLoggedInUserId();
+  if (!userId) {
+    alert('Please login first');
+    showPage('login');
+    return;
+  }
 
-      const btn = document.getElementById('payBtn');
-      btn.disabled = true;
-      btn.textContent = 'Processing...';
+  const months = selectedPass();
+  const amount = passAmount(months);
+  const paymentMethod = document.querySelector('input[name="paymode"]:checked').value;
+  const upiId = document.getElementById('upiId').value.trim();
 
-      try {
-        const res = await fetch(API_URL + '/process-payment', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            user_id: userId,
-            amount,
-            payment_method: paymentMethod,
-            upi_id: upiId || null
-          })
-        });
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
 
-        const data = await res.json();
-
-        if (data.success) {
-          alert('Payment successful! Generating your pass...');
-          await generatePass();
-        } else {
-          alert('Payment failed: ' + data.message);
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error processing payment');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Pay Now';
-      }
+  try {
+    const res = await fetch(API_URL + '/process-payment', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: userId,
+        amount,
+        payment_method: paymentMethod,
+        upi_id: upiId || null
+      })
     });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert('Payment successful! Generating your pass...');
+      await generatePass();
+    } else {
+      alert('Payment failed: ' + data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error processing payment');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Pay Now';
+  }
+});
+
 
     // ==================== GENERATE PASS ====================
     async function generatePass() {
@@ -1023,6 +1402,169 @@ document.getElementById('studentForm').addEventListener('submit', async e => {
     if (getLoggedInUserId()) {
       console.log('User is logged in:', getLoggedInUserId());
     }
+
+    //chatbot//
+    // Toggle chatbot
+const chatbotBtn = document.getElementById("chatbotBtn");
+const chatbotBox = document.getElementById("chatbotBox");
+
+chatbotBtn.onclick = () => {
+  chatbotBox.classList.toggle("hidden");
+};
+
+// Send message
+async function sendMessage(){
+
+const input = document.getElementById("chatInput");
+const chat = document.getElementById("chatMessages");
+
+let userMessage = input.value.trim();
+if(userMessage === "") return;
+
+chat.innerHTML += "<div><b>You:</b> " + userMessage + "</div>";
+input.value = "";
+
+const API_KEY = "YOUR_NEW_API_KEY";
+
+try{
+
+const response = await fetch(
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+contents: [
+{
+role: "user",
+parts: [
+{ text: userMessage }
+]
+}
+]
+})
+}
+);
+
+const data = await response.json();
+
+if(data.candidates && data.candidates.length > 0){
+
+const botReply = data.candidates[0].content.parts[0].text;
+
+chat.innerHTML += "<div><b>Bot:</b> " + botReply + "</div>";
+
+}else{
+
+console.log(data);
+chat.innerHTML += "<div><b>Bot:</b> AI could not generate a response.</div>";
+
+}
+
+}catch(error){
+
+console.error(error);
+chat.innerHTML += "<div><b>Bot:</b> AI connection failed.</div>";
+
+}
+
+}
+/* new */ 
+function sendStudentSubmittedEmail(studentData) {
+  return emailjs.send("service_t2cksvy", "template_mzagosc", {
+    student_name:  studentData.stu_name,
+    student_email: studentData.stu_email,
+    college_name:  studentData.stu_college,
+    start_point:   studentData.start_point,
+    dest_point:    studentData.dest_point,
+    duration:      studentData.duration,
+    subject_line:  "Form Submitted Successfully",
+    message:       "Your bus pass application has been submitted to your college for verification. You will receive another email once the college reviews it.",
+    action_text:   "Please wait for college approval. We will notify you by email."
+  });
+}
+
+function sendCollegeNotificationEmail(studentData) {
+  const base = "https://manasi-zirpe.github.io/Smart-Bus-Travel/approve.html";
+  const approveLink = base + "?action=approved&email=" + encodeURIComponent(studentData.stu_email) + "&name=" + encodeURIComponent(studentData.stu_name) + "&college=" + encodeURIComponent(studentData.stu_college) + "&start=" + encodeURIComponent(studentData.start_point) + "&dest=" + encodeURIComponent(studentData.dest_point) + "&duration=" + encodeURIComponent(studentData.duration);
+
+const rejectLink = base + "?action=rejected&email=" + encodeURIComponent(studentData.stu_email) + "&name=" + encodeURIComponent(studentData.stu_name) + "&college=" + encodeURIComponent(studentData.stu_college) + "&start=" + encodeURIComponent(studentData.start_point) + "&dest=" + encodeURIComponent(studentData.dest_point) + "&duration=" + encodeURIComponent(studentData.duration);
+
+  return emailjs.send("service_t2cksvy", "template_67xvnjm", {
+    to_email:      "zirpemanasi@gmail.com",
+    student_name:  studentData.stu_name,
+    student_email: studentData.stu_email,
+    college_name:  studentData.stu_college,
+    stu_course:    studentData.stu_course,
+    start_point:   studentData.start_point,
+    dest_point:    studentData.dest_point,
+    duration:      studentData.duration,
+    aadhar_number: studentData.aadhar_number,
+    approve_link:  approveLink,
+    reject_link:   rejectLink
+  });
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const studentData = {
+    stu_name:     document.getElementById('stu_name').value,
+    stu_email:    document.getElementById('stu_email').value,
+    stu_college:  document.getElementById('stu_college').value,
+    stu_course:   document.getElementById('stu_course').value,
+    stu_dob:      document.getElementById('stu_dob').value,
+    stu_phone:    document.getElementById('stu_phone').value,
+    stu_address:  document.getElementById('stu_address').value,
+    start_point:  document.getElementById('start_point').value,
+    dest_point:   document.getElementById('dest_point').value,
+    duration:     document.getElementById('duration').value,
+    aadhar_number: document.getElementById('aadharNumber').value,
+  };
+
+  // Basic validation
+  if (!studentData.stu_name || !studentData.stu_email || !studentData.stu_college) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  try {
+    // Show loading
+    const submitBtn = document.querySelector('#studentForm button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+    }
+
+    // Send both emails at the same time
+    await Promise.all([
+      sendStudentSubmittedEmail(studentData),
+      sendCollegeNotificationEmail(studentData)
+    ]);
+
+    alert("Form submitted successfully! Check your email for confirmation.");
+    showPage('home')
+
+    // Reset button
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit for verification";
+    }
+
+  } catch (error) {
+    console.error("Email error:", error);
+    alert("Form submitted but email failed. Error: " + (error.text || error.message || "Unknown error"));
+  }
+}
+
+// Attach to your form
+const studentForm = document.getElementById('studentForm');
+if (studentForm) {
+  studentForm.addEventListener('submit', handleFormSubmit);
+}
+/* new */
 </script>
 </body>
 </html>
