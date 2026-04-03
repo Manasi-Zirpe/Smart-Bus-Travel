@@ -35,22 +35,30 @@
 </div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const action = params.get('action');
-  const email  = params.get('email');
-  const name   = params.get('name');
+ const params   = new URLSearchParams(window.location.search);
+const action   = params.get('action');
+const email    = params.get('email');
+const name     = params.get('name');
+const college  = params.get('college') || 'Your College';
+const start    = params.get('start')   || '';
+const dest     = params.get('dest')    || '';
+const duration = params.get('duration')|| '';
 
-  const studentEmail = decodeURIComponent(email || '');
-  const studentName  = decodeURIComponent(name  || '');
+const studentEmail = decodeURIComponent(email    || '');
+const studentName  = decodeURIComponent(name     || '');
+const collegeName  = decodeURIComponent(college  || '');
+const startPoint   = decodeURIComponent(start    || '');
+const destPoint    = decodeURIComponent(dest     || '');
+const passDuration = decodeURIComponent(duration || '');
 
-  document.getElementById('info').textContent =
+document.getElementById('info').textContent =
     "Student: " + studentName + " | " + studentEmail;
 
-  if (action === 'approved' || action === 'rejected') {
+if (action === 'approved' || action === 'rejected') {
     verify(action);
-  }
+}
 
-  async function verify(decision) {
+async function verify(decision) {
     document.getElementById('buttons').style.display = 'none';
     document.getElementById('result').style.display  = 'block';
     document.getElementById('result').className      = 'result';
@@ -62,14 +70,14 @@
       await emailjs.send("service_t2cksvy", "template_mzagosc", {
         student_name:  studentName,
         student_email: studentEmail,
-        college_name:  "College",
-        start_point:   "",
-        dest_point:    "",
-        duration:      "",
+        college_name:  collegeName,
+        start_point:   startPoint,
+        dest_point:    destPoint,
+        duration:      passDuration,
         subject_line:  isApproved ? "Application APPROVED" : "Application REJECTED",
         message: isApproved
           ? "Congratulations! Your application has been approved by your college. Please login to SBT and proceed to payment to generate your bus pass."
-          : "Sorry, your application has been rejected by your college. Please login to SBT, correct your details, and resubmit your application.",
+          : "Sorry, your application has been rejected by your college. Please login to SBT, correct your details, and resubmit.",
         action_text: "Visit: https://manasi-zirpe.github.io/Smart-Bus-Travel/"
       });
 
@@ -84,7 +92,7 @@
       resultDiv.className = 'result error';
       resultDiv.textContent = 'Email failed. Error: ' + (err.text || err.message || JSON.stringify(err));
     }
-  }
+}
 </script>
 </body>
 </html>
